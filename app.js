@@ -298,7 +298,6 @@ function updateUI() {
         `;
         progressList.appendChild(item);
     });
-}
     resetRecordingUI();
 }
 
