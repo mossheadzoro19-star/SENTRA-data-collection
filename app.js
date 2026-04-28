@@ -460,7 +460,7 @@ uploadBtn.addEventListener('click', async () => {
     if (!audioBlob) return;
     
     uploadBtn.disabled = true;
-    uploadBtn.innerHTML = '<span class="icon">⏳</span> Uploading...';
+    uploadBtn.innerHTML = 'Uploading...';
     discardBtn.disabled = true;
     
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
