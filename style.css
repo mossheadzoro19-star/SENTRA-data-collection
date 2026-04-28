@@ -1,14 +1,14 @@
 :root {
-    --bg-color: #0f172a;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --accent-color: #6366f1;
-    --accent-hover: #4f46e5;
-    --success-color: #10b981;
+    --bg-color: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --accent-color: #4f46e5;
+    --accent-hover: #4338ca;
+    --success-color: #059669;
     --danger-color: #ef4444;
     --danger-hover: #dc2626;
-    --glass-bg: rgba(30, 41, 59, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --card-bg: #ffffff;
+    --border-color: #e2e8f0;
     --font-family: 'Inter', sans-serif;
 }
 
@@ -28,49 +28,9 @@ body {
     align-items: center;
     overflow-x: hidden;
     position: relative;
-}
-
-/* Background Animated Blobs */
-.background-effects {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-.blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.5;
-    animation: float 20s infinite ease-in-out;
-}
-
-.blob-1 {
-    width: 400px;
-    height: 400px;
-    background: #4f46e5;
-    top: -100px;
-    left: -100px;
-}
-
-.blob-2 {
-    width: 500px;
-    height: 500px;
-    background: #db2777;
-    bottom: -150px;
-    right: -100px;
-    animation-delay: -5s;
-}
-
-@keyframes float {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(30px, -50px) scale(1.1); }
-    66% { transform: translate(-20px, 20px) scale(0.9); }
+    /* subtle pattern for minimal bg */
+    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 40px 40px;
 }
 
 /* Common UI */
@@ -101,13 +61,11 @@ body {
 }
 
 .glass-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
     padding: 40px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .btn {
@@ -115,8 +73,8 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 24px;
-    border-radius: 12px;
+    padding: 14px 28px;
+    border-radius: 100px;
     font-weight: 600;
     font-size: 16px;
     border: none;
@@ -126,7 +84,7 @@ body {
 }
 
 .btn:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
     transform: none !important;
 }
@@ -142,23 +100,22 @@ body {
 
 .primary-btn:hover:not(:disabled) {
     background: var(--accent-hover);
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .secondary-btn {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: white;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
 }
 
 .secondary-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.15);
+    background: #f1f5f9;
 }
 
 .small {
-    padding: 8px 16px;
+    padding: 8px 20px;
     font-size: 14px;
-    border-radius: 8px;
 }
 
 /* Login View */
@@ -171,9 +128,8 @@ body {
 .login-card h1 {
     font-size: 28px;
     margin-bottom: 8px;
-    background: linear-gradient(to right, #fff, #a5b4fc);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
+    font-weight: 700;
 }
 
 .subtitle {
@@ -191,17 +147,17 @@ body {
     display: block;
     margin-bottom: 8px;
     font-size: 14px;
-    font-weight: 500;
-    color: var(--text-secondary);
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .input-group input {
     width: 100%;
     padding: 14px 16px;
     border-radius: 12px;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
     font-family: var(--font-family);
     font-size: 16px;
     transition: all 0.3s ease;
@@ -210,7 +166,8 @@ body {
 .input-group input:focus {
     outline: none;
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
 }
 
 #login-form button {
@@ -221,6 +178,7 @@ body {
     color: var(--danger-color);
     margin-top: 16px;
     font-size: 14px;
+    font-weight: 500;
 }
 
 /* Dashboard Header */
@@ -241,7 +199,8 @@ body {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-color), #db2777);
+    background: var(--accent-color);
+    color: white;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -252,6 +211,7 @@ body {
 .user-info h2 {
     font-size: 20px;
     margin-bottom: 4px;
+    font-weight: 700;
 }
 
 .stats {
@@ -286,28 +246,29 @@ body {
 
 .target-label-info h3 {
     color: var(--text-secondary);
-    font-size: 16px;
+    font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+    font-weight: 600;
 }
 
 .label-badge {
     display: inline-block;
-    padding: 12px 24px;
-    background: rgba(99, 102, 241, 0.1);
-    border: 1px solid rgba(99, 102, 241, 0.3);
+    padding: 14px 28px;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
     border-radius: 100px;
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 700;
-    color: #a5b4fc;
-    margin-bottom: 12px;
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    color: var(--accent-color);
+    margin-bottom: 16px;
 }
 
 .label-progress {
     font-size: 16px;
     color: var(--text-secondary);
+    font-weight: 500;
 }
 
 /* Recording Controls */
@@ -322,6 +283,9 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    background: #f1f5f9;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
 canvas#audio-visualizer {
@@ -337,10 +301,10 @@ canvas#audio-visualizer {
     gap: 8px;
     color: var(--danger-color);
     font-weight: 600;
-    background: rgba(239, 68, 68, 0.1);
+    background: #fef2f2;
     padding: 8px 16px;
     border-radius: 100px;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    border: 1px solid #fecaca;
 }
 
 .dot {
@@ -365,68 +329,60 @@ canvas#audio-visualizer {
 }
 
 .record-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 18px;
-    padding: 16px 32px;
-    border-radius: 100px;
+    background: white;
+    border: 2px solid var(--border-color);
+    color: var(--text-primary);
 }
 
 .record-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--text-secondary);
 }
 
 .stop-btn {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid var(--danger-color);
-    color: #fca5a5;
-    font-size: 18px;
-    padding: 16px 32px;
-    border-radius: 100px;
+    background: #fef2f2;
+    border: 2px solid var(--danger-color);
+    color: var(--danger-color);
 }
 
 .stop-btn:hover {
-    background: rgba(239, 68, 68, 0.2);
+    background: #fee2e2;
 }
 
 .upload-btn {
     background: var(--success-color);
     color: white;
-    font-size: 18px;
-    padding: 16px 32px;
-    border-radius: 100px;
 }
 
 .upload-btn:hover:not(:disabled) {
-    background: #059669;
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    background: #047857;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
 }
 
 .discard-btn {
     background: transparent;
-    border: 1px solid var(--text-secondary);
+    border: 2px solid var(--border-color);
     color: var(--text-secondary);
-    padding: 16px 24px;
-    border-radius: 100px;
 }
 
 .discard-btn:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
+    background: #f8fafc;
+    color: var(--text-primary);
 }
 
 .status-msg {
     margin-top: 16px;
     font-size: 14px;
     height: 20px;
+    font-weight: 500;
 }
 
 /* Progress List */
 .progress-card h3 {
     margin-bottom: 24px;
     font-size: 18px;
-    border-bottom: 1px solid var(--glass-border);
-    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 16px;
+    font-weight: 700;
 }
 
 .progress-list {
@@ -448,24 +404,26 @@ canvas#audio-visualizer {
 }
 
 .progress-name {
-    font-weight: 500;
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
 .progress-count {
     color: var(--text-secondary);
+    font-weight: 500;
 }
 
 .progress-bar-bg {
-    height: 6px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 3px;
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 4px;
     overflow: hidden;
 }
 
 .progress-bar-fill {
     height: 100%;
     background: var(--accent-color);
-    border-radius: 3px;
+    border-radius: 4px;
     transition: width 0.5s ease;
 }
 
@@ -492,8 +450,8 @@ canvas#audio-visualizer {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
     z-index: 1000;
     display: flex;
     justify-content: center;
@@ -509,6 +467,7 @@ canvas#audio-visualizer {
 .modal-card h2 {
     margin-bottom: 24px;
     text-align: center;
+    font-weight: 700;
 }
 
 .instructions-list {
@@ -521,13 +480,13 @@ canvas#audio-visualizer {
 .instructions-list li {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: 16px;
     font-size: 15px;
-    color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.05);
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    background: #f8fafc;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
 }
 
 .instructions-list li .icon {
@@ -535,12 +494,13 @@ canvas#audio-visualizer {
 }
 
 .label-instruction {
-    font-size: 18px;
+    font-size: 16px;
     color: var(--text-primary);
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     font-weight: 500;
-    background: rgba(255, 255, 255, 0.05);
+    background: #f8fafc;
     padding: 12px 24px;
     border-radius: 8px;
+    border: 1px solid var(--border-color);
     display: inline-block;
 }
