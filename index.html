@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentra Dataset Contribution</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-effects">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <!-- Login Section -->
+    <main id="login-section" class="view-section active">
+        <div class="glass-card login-card">
+            <h1>Sentra Dataset Contribution</h1>
+            <p class="subtitle">Contribute to the next generation of wake-word detection models.</p>
+            
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter your username" required autocomplete="off">
+                </div>
+                <button type="submit" class="btn primary-btn">Continue</button>
+            </form>
+            <div id="login-error" class="error-msg hidden"></div>
+        </div>
+    </main>
+
+    <!-- Instructions Modal -->
+    <div id="instructions-modal" class="modal-overlay hidden">
+        <div class="glass-card modal-card">
+            <h2>Recording Instructions</h2>
+            <ul class="instructions-list">
+                <li><span class="icon">🤫</span> Record in a quiet place first, then optionally with noise.</li>
+                <li><span class="icon">🗣️</span> Speak clearly and naturally.</li>
+                <li><span class="icon">📱</span> Keep device ~20–40 cm from mouth.</li>
+                <li><span class="icon">🏢</span> Avoid echo environments.</li>
+                <li><span class="icon">⏱️</span> Each recording will automatically stop after ~2 seconds.</li>
+                <li><span class="icon">🎯</span> Say ONLY the required phrase.</li>
+            </ul>
+            <button id="close-instructions-btn" class="btn primary-btn" style="width: 100%; margin-top: 20px;">I Understand</button>
+        </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <main id="dashboard-section" class="view-section hidden">
+        <header class="dashboard-header">
+            <div class="user-info">
+                <span class="avatar" id="user-avatar">?</span>
+                <div>
+                    <h2 id="display-username">Username</h2>
+                    <p class="stats" id="total-progress">0 / 70 Recordings</p>
+                </div>
+            </div>
+            <button id="logout-btn" class="btn secondary-btn small">Logout</button>
+        </header>
+
+        <div class="dashboard-content">
+            <!-- Recording Interface -->
+            <div class="glass-card main-recording-card">
+                <div id="completion-message" class="hidden">
+                    <div class="success-icon">🎉</div>
+                    <h2>All targets completed!</h2>
+                    <p>Thank you for contributing to the dataset.</p>
+                </div>
+
+                <div id="recording-interface">
+                    <div class="target-label-info">
+                        <h3>Current Target</h3>
+                        <div class="label-badge" id="current-label">WAKE_NORMAL</div>
+                        <p class="label-instruction" id="current-instruction">Say "hey sentra" normally</p>
+                        <p class="label-progress" id="current-label-progress">0 / 15</p>
+                    </div>
+
+                    <div class="recording-controls">
+                        <div class="visualizer-container">
+                            <canvas id="audio-visualizer"></canvas>
+                            <div class="recording-indicator hidden" id="recording-indicator">
+                                <span class="dot"></span> Recording...
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button id="start-record-btn" class="btn record-btn">
+                                <span class="icon">🎙️</span> Start Recording
+                            </button>
+                            <button id="stop-record-btn" class="btn stop-btn hidden">
+                                <span class="icon">⏹️</span> Stop Recording
+                            </button>
+                            <button id="upload-btn" class="btn upload-btn hidden" disabled>
+                                <span class="icon">☁️</span> Upload
+                            </button>
+                            <button id="discard-btn" class="btn discard-btn hidden">
+                                <span class="icon">🗑️</span> Discard
+                            </button>
+                        </div>
+                        <div id="action-status" class="status-msg"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Summary -->
+            <div class="glass-card progress-card">
+                <h3>Your Progress</h3>
+                <div class="progress-list" id="progress-list">
+                    <!-- Progress items injected by JS -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
