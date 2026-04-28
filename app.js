@@ -8,41 +8,34 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Initialize Supabase Client (renamed to supabaseClient to avoid global collision with CDN)
 const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-const TARGETS = {
-    WAKE_NORMAL: 15,
-    WAKE_SLOW: 10,
-    WAKE_FAST: 10,
-    WAKE_SOFT: 10,
-    WAKE_NOISE: 5,
-    NON_WAKE: 20
-};
+// Recording targets based on "Per person breakdown"
+const RECORDING_TARGETS = [
+    // Wake Word Section
+    { label: 'Normal', count: 15, instruction: 'Say "hey sentra" normally', category: 'wake_word' },
+    { label: 'Fast', count: 10, instruction: 'Say "hey sentra" quickly', category: 'wake_word' },
+    { label: 'Slow', count: 10, instruction: 'Say "hey sentra" slowly', category: 'wake_word' },
+    { label: 'Noisy', count: 7, instruction: 'Say "hey sentra" with background noise', category: 'wake_word' },
+    { label: 'Far distance', count: 8, instruction: 'Say "hey sentra" from 2-3 meters away', category: 'wake_word' },
+    
+    // Non-Wake Word Section
+    { label: 'Random', count: 20, instruction: 'Say anything EXCEPT "hey sentra"', category: 'non_wake_word' }
+];
 
-const INSTRUCTIONS = {
-    WAKE_NORMAL: 'Say "hey sentra" normally',
-    WAKE_SLOW: 'Say "hey sentra" slowly and clearly',
-    WAKE_FAST: 'Say "hey sentra" quickly but clearly',
-    WAKE_SOFT: 'Speak softly or increase distance from device',
-    WAKE_NOISE: 'Record with background noise (fan, people, etc.)',
-    NON_WAKE: 'Say any normal sentence (NOT "hey sentra")'
-};
+let currentUser = null;
+let currentTargetIndex = 0;
+let recordingsCount = {}; // Tracks counts per label
 
-const TOTAL_REQUIRED = Object.values(TARGETS).reduce((a, b) => a + b, 0);
-const RECORDING_DURATION_MS = 2000;
+// Initialize recordingsCount
+RECORDING_TARGETS.forEach(target => {
+    recordingsCount[target.label] = 0;
+});
+
+const RECORDING_DURATION_MS = 2500; // Slightly longer to accommodate "Slow" recordings
 const SILENCE_THRESHOLD = 5; // minimum volume required to be valid
 
 // -------------------------------------------------------------------
 // STATE
 // -------------------------------------------------------------------
-let currentUser = null;
-let currentProgress = {
-    WAKE_NORMAL: 0,
-    WAKE_SLOW: 0,
-    WAKE_FAST: 0,
-    WAKE_SOFT: 0,
-    WAKE_NOISE: 0,
-    NON_WAKE: 0
-};
-let currentLabel = 'WAKE_NORMAL';
 
 let mediaRecorder = null;
 let audioChunks = [];
@@ -224,61 +217,57 @@ function showLoginError(msg) {
 // DATABASE & PROGRESS TRACKING
 // -------------------------------------------------------------------
 async function loadProgress() {
-    // In a real app with Supabase initialized:
-    if (supabaseClient) {
-        try {
-            const { data, error } = await supabaseClient
-                .from('recordings')
-                .select('label')
-                .eq('username', currentUser);
-                
-            if (!error && data) {
-                // Reset counts
-                Object.keys(TARGETS).forEach(k => currentProgress[k] = 0);
-                // Aggregate
-                data.forEach(row => {
-                    if (currentProgress[row.label] !== undefined) {
-                        currentProgress[row.label]++;
-                    }
-                });
-            }
-        } catch (err) {
-            console.error("Supabase not fully configured yet. Using local state.");
+    if (!supabaseClient || !currentUser) return;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('recordings')
+            .select('label')
+            .eq('username', currentUser);
+            
+        if (!error && data) {
+            // Reset counts
+            RECORDING_TARGETS.forEach(t => recordingsCount[t.label] = 0);
+            
+            // Aggregate
+            data.forEach(row => {
+                if (recordingsCount[row.label] !== undefined) {
+                    recordingsCount[row.label]++;
+                }
+            });
+            
+            // Find current target index
+            updateCurrentTarget();
         }
-    } else {
-        console.warn("Supabase not configured. Using local session data.");
-        // Mock data for demo if no backend configured
-        const localData = JSON.parse(localStorage.getItem(`progress_${currentUser}`) || '{}');
-        Object.keys(TARGETS).forEach(k => {
-            currentProgress[k] = localData[k] || 0;
-        });
+    } catch (err) {
+        console.error("Error loading progress:", err);
     }
 }
 
-function saveProgressLocally() {
-    localStorage.setItem(`progress_${currentUser}`, JSON.stringify(currentProgress));
-}
-
-function getNextLabel() {
-    for (const [label, target] of Object.entries(TARGETS)) {
-        if (currentProgress[label] < target) {
-            return label;
+function updateCurrentTarget() {
+    for (let i = 0; i < RECORDING_TARGETS.length; i++) {
+        const target = RECORDING_TARGETS[i];
+        if (recordingsCount[target.label] < target.count) {
+            currentTargetIndex = i;
+            return;
         }
     }
-    return null; // All done!
+    currentTargetIndex = RECORDING_TARGETS.length; // All done
 }
 
 // -------------------------------------------------------------------
 // UI UPDATES
 // -------------------------------------------------------------------
 function updateUI() {
-    currentLabel = getNextLabel();
+    updateCurrentTarget();
+    const target = RECORDING_TARGETS[currentTargetIndex];
     
     // Total progress
-    const totalDone = Object.values(currentProgress).reduce((a, b) => a + b, 0);
-    totalProgressText.textContent = `${totalDone} / ${TOTAL_REQUIRED} Recordings`;
+    const totalDone = Object.values(recordingsCount).reduce((a, b) => a + b, 0);
+    const totalRequired = RECORDING_TARGETS.reduce((a, b) => a + b.count, 0);
+    totalProgressText.textContent = `${totalDone} / ${totalRequired} Recordings`;
     
-    if (totalDone >= TOTAL_REQUIRED || !currentLabel) {
+    if (currentTargetIndex >= RECORDING_TARGETS.length) {
         // Show completion state
         recordingInterface.classList.add('hidden');
         completionMessage.classList.remove('hidden');
@@ -287,32 +276,29 @@ function updateUI() {
         completionMessage.classList.add('hidden');
         
         // Update current target info
-        currentLabelEl.textContent = currentLabel;
-        currentLabelProgressEl.textContent = `${currentProgress[currentLabel]} / ${TARGETS[currentLabel]}`;
-        currentInstructionEl.textContent = INSTRUCTIONS[currentLabel];
+        currentLabelEl.textContent = target.label;
+        currentLabelProgressEl.textContent = `${recordingsCount[target.label]} / ${target.count}`;
+        currentInstructionEl.textContent = target.instruction;
     }
     
     // Render progress list
     progressList.innerHTML = '';
-    for (const [label, target] of Object.entries(TARGETS)) {
-        const count = currentProgress[label];
-        const percent = Math.min(100, Math.round((count / target) * 100));
-        const isComplete = count >= target;
-        
+    RECORDING_TARGETS.forEach(t => {
+        const percent = Math.min(100, (recordingsCount[t.label] / t.count) * 100);
         const item = document.createElement('div');
-        item.className = `progress-item ${isComplete ? 'completed' : ''}`;
+        item.className = `progress-item ${percent >= 100 ? 'completed' : ''}`;
         item.innerHTML = `
             <div class="progress-header">
-                <span class="progress-name">${label}</span>
-                <span class="progress-count">${count} / ${target}</span>
+                <span class="progress-name">${t.label}</span>
+                <span class="progress-count">${recordingsCount[t.label]} / ${t.count}</span>
             </div>
             <div class="progress-bar-bg">
                 <div class="progress-bar-fill" style="width: ${percent}%"></div>
             </div>
         `;
         progressList.appendChild(item);
-    }
-    
+    });
+}
     resetRecordingUI();
 }
 
@@ -464,14 +450,16 @@ uploadBtn.addEventListener('click', async () => {
     discardBtn.disabled = true;
     
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `${currentUser}_${currentLabel}_${timestamp}.wav`; // Saving with .wav extension as requested
+    const target = RECORDING_TARGETS[currentTargetIndex];
+    const filename = `${timestamp}.wav`;
+    const storagePath = `${currentUser}/${target.category}/${target.label}/${filename}`;
     
     try {
         if (supabaseClient) {
             // Upload to Supabase Storage
             const { error: uploadError } = await supabaseClient.storage
                 .from('audio_data')
-                .upload(filename, audioBlob, {
+                .upload(storagePath, audioBlob, {
                     cacheControl: '3600',
                     upsert: false
                 });
@@ -489,7 +477,7 @@ uploadBtn.addEventListener('click', async () => {
                 .insert([
                     {
                         username: currentUser,
-                        label: currentLabel,
+                        label: target.label,
                         file_url: publicUrl,
                         timestamp: new Date().toISOString()
                     }
@@ -498,9 +486,8 @@ uploadBtn.addEventListener('click', async () => {
             if (dbError) throw dbError;
         }
         
-        // Update Progress Locally (Assume Success or no backend)
-        currentProgress[currentLabel]++;
-        saveProgressLocally();
+        // Update Progress Locally
+        recordingsCount[target.label]++;
         
         showSuccessStatus("Upload successful!");
         setTimeout(() => {
@@ -512,7 +499,7 @@ uploadBtn.addEventListener('click', async () => {
         showErrorStatus("Failed to upload. Please try again. " + err.message);
         uploadBtn.disabled = false;
         discardBtn.disabled = false;
-        uploadBtn.innerHTML = '<span class="icon">☁️</span> Upload';
+        uploadBtn.innerHTML = 'Upload';
     }
 });
 
