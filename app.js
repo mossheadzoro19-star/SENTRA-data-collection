@@ -87,6 +87,20 @@ document.addEventListener('DOMContentLoaded', () => {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     
+    // Theme Toggle Logic
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.body.setAttribute('data-theme', savedTheme);
+    themeBtn.textContent = savedTheme === 'light' ? '🌓' : '☀️';
+
+    themeBtn.addEventListener('click', () => {
+        const currentTheme = document.body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        themeBtn.textContent = newTheme === 'light' ? '🌓' : '☀️';
+    });
+
     // Check for existing session
     try {
         const savedUsername = localStorage.getItem('voice_app_username');
@@ -307,6 +321,10 @@ function resetRecordingUI() {
     uploadBtn.classList.add('hidden');
     discardBtn.classList.add('hidden');
     recordingIndicator.classList.add('hidden');
+    
+    uploadBtn.innerHTML = 'Upload';
+    uploadBtn.disabled = true;
+    
     actionStatus.textContent = '';
     actionStatus.style.color = 'inherit';
     audioBlob = null;
@@ -331,7 +349,12 @@ startRecordBtn.addEventListener('click', async () => {
         microphone.connect(analyser);
         analyser.fftSize = 256;
         
-        mediaRecorder = new MediaRecorder(stream);
+        // Optimize for speed: use low bitrate for voice (24kbps is enough for ML models)
+        const options = {
+            audioBitsPerSecond: 24000,
+            mimeType: MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm'
+        };
+        mediaRecorder = new MediaRecorder(stream, options);
         audioChunks = [];
         maxVolumeRecorded = 0;
         
@@ -410,7 +433,7 @@ function visualize() {
         
         for(let i = 0; i < bufferLength; i++) {
             const barHeight = dataArray[i] / 2;
-            canvasCtx.fillStyle = `rgb(${barHeight + 100}, 99, 241)`;
+            canvasCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
             canvasCtx.fillRect(x, audioVisualizer.height - barHeight, barWidth, barHeight);
             x += barWidth + 1;
         }

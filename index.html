@@ -4,20 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sentra Dataset Contribution</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Brutalist Tech stack -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-theme="light">
+    <div class="theme-toggle">
+        <button id="theme-toggle-btn" class="theme-btn">🌓</button>
+    </div>
     <!-- Clean minimalist background -->
 
     <!-- Login Section -->
     <main id="login-section" class="view-section active">
         <div class="glass-card login-card">
-            <h1>Sentra Voice</h1>
+            <h1>Sentra<br>Voice</h1>
             <p class="subtitle">Voice data collection.</p>
             
             <form id="login-form">
@@ -57,7 +60,9 @@
                     <p class="stats" id="total-progress">0 / 70 Recordings</p>
                 </div>
             </div>
-            <button id="logout-btn" class="btn secondary-btn small">Logout</button>
+            <div class="profile-actions">
+                <button id="logout-btn" class="btn secondary-btn">Exit</button>
+            </div>
         </header>
 
         <div class="dashboard-content">
@@ -113,6 +118,10 @@
             </div>
         </div>
     </main>
+
+    <footer class="footer">
+        Developed by <strong>Tejas</strong>
+    </footer>
 
     <script src="app.js"></script>
 </body>
