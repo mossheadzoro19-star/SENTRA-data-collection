@@ -18,7 +18,8 @@ const RECORDING_TARGETS = [
     { label: 'Far distance', count: 8, instruction: 'Say "hey sentra" from 2-3 meters away', category: 'wake_word' },
     
     // Non-Wake Word Section
-    { label: 'Random', count: 20, instruction: 'Say anything EXCEPT "hey sentra"', category: 'non_wake_word' }
+    { label: 'Similar', count: 10, instruction: 'Say similar words to "sentra"', category: 'non_wake_word' },
+    { label: 'Random', count: 10, instruction: 'Say random words', category: 'non_wake_word' }
 ];
 
 let currentUser = null;
